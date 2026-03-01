@@ -52,4 +52,4 @@ log_cli_level = "WARNING"
 log_cli_format = "[%(levelname)s] %(message)s"
 
 [tool.hatch.build]
-exclude = ["/examples"]
+exclude = ["/examples", "tests/data"]

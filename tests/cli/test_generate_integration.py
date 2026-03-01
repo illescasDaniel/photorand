@@ -24,7 +24,13 @@ def run_cli_integration(args_list: list[str], capsys: pytest.CaptureFixture[str]
 ])
 def test_extract_integration(image_filename: str, expected_int: int, expected_range: int, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch):
 	base_dir = Path(__file__).resolve().parent.parent
-	image_path = str(base_dir / "data" / image_filename)
+	image_file = base_dir / "data" / image_filename
+
+	# Check if the file exists; if not, gracefully skip this specific iteration
+	if not image_file.exists():
+		pytest.skip(f"Test data file {image_filename} not found. Skipping test.")
+
+	image_path = str(image_file)
 
 	# Test hex format (default)
 	out_hex = run_cli_integration(["extract", image_path], capsys, monkeypatch)
