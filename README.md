@@ -5,6 +5,8 @@
 
 A True Random Number Generator (TRNG) using raw camera sensor data to extract physical entropy.
 
+![Architecture](https://res.cloudinary.com/dhnsmw569/image/upload/photorand_dtj6xn.webp)
+
 ## Project Structure
 
 - `src/photorand/` - Main package source code.
@@ -13,6 +15,7 @@ A True Random Number Generator (TRNG) using raw camera sensor data to extract ph
 	- `cli/` - Command-line interface logic.
 - `docs/` - Technical and scientific documentation detailing the [entropy extraction](docs/entropy-extraction.md) and [entropy expansion](docs/entropy-expansion.md) mechanisms.
 - `tests/` - Comprehensive test suite organized by architectural layer.
+- `examples/` - Code samples, useful scripts
 
 ## Installation
 
