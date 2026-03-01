@@ -1,6 +1,6 @@
 import os
 
-from photorand import PhotoRandSeed, PhotoRandEngine
+from photorand import PhotoRandEngine, PhotoRandSeed
 
 
 def main():
