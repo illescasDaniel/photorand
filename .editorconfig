@@ -1,0 +1,6 @@
+# .editorconfig
+root = true
+
+[*.py]
+indent_style = tabs
+quote_type = double

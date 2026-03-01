@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "photorand"
+version = "1.0.0"
+authors = [{ name = "Daniel Illescas Romero", email = "dev@daniel-ir.eu" }]
+description = "A True Random Number Generator using raw camera sensor data."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["rawpy>=0.26.1", "numpy>=2.0.0", "cryptography>=46.0.0"]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+]
+
+[project.scripts]
+photorand = "photorand.cli.main:main"
+
+[project.urls]
+Homepage = "https://github.com/illescasDaniel/photorand"
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "vermin", "build"]
+
+# --- RUFF (Linter & Import Sorter) ---
+[tool.ruff]
+line-length = 160
+target-version = 'py312'
+src = ['src']
+
+[tool.ruff.lint]
+# Enable specific rules:
+# F = Pyflakes (Finds unused imports/variables)
+# I = isort (Sorts imports)
+# E = pycodestyle errors
+select = ['F', 'I', 'E']
+# Allow fixing for all enabled rules (imports will be removed/sorted automatically)
+fixable = ['ALL']
+# --- RUFF end ---
+
+[tool.ruff.lint.isort]
+# Ensure compatibility with YAPF's vertical style
+combine-as-imports = true
+lines-after-imports = 2
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "WARNING"
+log_cli_format = "[%(levelname)s] %(message)s"
+
+[tool.hatch.build]
+exclude = ["/examples"]
