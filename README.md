@@ -52,7 +52,7 @@ The high-level classes provide a stateful and convenient interface for both TRNG
 Encapsulates the process of extracting entropy from a RAW image. It is perfect for generating one-off secure seeds, keys, or dice rolls directly from physical noise.
 
 ```python
-from photorand.high_level.seed import PhotoRandSeed
+from photorand import PhotoRandSeed
 
 # 1. Extract entropy from a RAW image
 seed = PhotoRandSeed("path/to/image.raw")
@@ -69,7 +69,7 @@ luck = seed.to_int_range(1, 100)
 An infinite stream generator powered by ChaCha20, seeded by a `PhotoRandSeed`. It handles salting (Time + PID) automatically to ensure that even consecutive runs with the same image produce unique streams.
 
 ```python
-from photorand.high_level.engine import PhotoRandEngine
+from photorand import PhotoRandEngine
 
 # 1. Initialize from image or existing Seed object
 engine = PhotoRandEngine("path/to/image.raw")
@@ -107,9 +107,9 @@ python -m photorand generate path/to/raw_image.ARW --type string -n 5 -l 16 --ch
 For maximum control or research, you can use the modular primitives directly.
 
 ```python
-from photorand.low_level.ingest import ingest_raw_image
-from photorand.low_level.sample import sample_entropy_grid
-from photorand.low_level.hash import hash_entropy_pool
+from photorand.low_level import ingest_raw_image
+from photorand.low_level import sample_entropy_grid
+from photorand.low_level import hash_entropy_pool
 
 # 1. Ingest raw sensor data
 raw_data = ingest_raw_image("path/to/image.raw")
@@ -123,7 +123,7 @@ seed_bytes = hash_entropy_pool(entropy_pool)
 
 Alternatively, use the functional pipeline. It accepts custom functions for each part of the algorithm (ingest_fn, sample_fn and hash_fn) although we already provide the values as default parameters:
 ```python
-from photorand.low_level.generate import generate_true_random_number
+from photorand.low_level import generate_true_random_number
 seed = generate_true_random_number("path/to/image.raw")
 ```
 
