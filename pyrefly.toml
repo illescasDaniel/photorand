@@ -1,9 +1,3 @@
 [pyrefly]
-source_directories = [
-    "src"
-]
-exclude = [
-    ".venv",
-    ".git",
-    "**/__pycache__"
-]
+source_directories = ["src", "tests", "examples"]
+exclude = [".venv", ".git", "**/__pycache__"]

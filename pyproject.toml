@@ -23,7 +23,7 @@ photorand = "photorand.cli.main:main"
 Homepage = "https://github.com/illescasDaniel/photorand"
 
 [project.optional-dependencies]
-dev = ["pytest", "ruff", "vermin", "build"]
+dev = ["pytest", "ruff", "vermin", "build", "imageio", "matplotlib"]
 
 # --- RUFF (Linter & Import Sorter) ---
 [tool.ruff]
@@ -52,4 +52,4 @@ log_cli_level = "WARNING"
 log_cli_format = "[%(levelname)s] %(message)s"
 
 [tool.hatch.build]
-exclude = ["/examples", "tests/data"]
+exclude = ["examples", "tests/data"]
