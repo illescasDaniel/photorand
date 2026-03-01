@@ -1,5 +1,8 @@
 # photorand
 
+[![PyPI version](https://img.shields.io/pypi/v/photorand)](https://pypi.org/project/photorand/)
+
+
 A True Random Number Generator (TRNG) using raw camera sensor data to extract physical entropy.
 
 ## Project Structure
@@ -12,6 +15,14 @@ A True Random Number Generator (TRNG) using raw camera sensor data to extract ph
 - `tests/` - Comprehensive test suite organized by architectural layer.
 
 ## Installation
+
+This project is available on PyPI:
+
+```bash
+pip install photorand
+```
+
+### From Source (Development)
 
 This project uses `pyproject.toml` for managing dependencies.
 
@@ -128,3 +139,8 @@ pytest
 ```bash
 ruff check --fix src tests examples
 ```
+
+## Resources
+
+- **Blog Post**: [Physical Entropy with PhotoRand](https://www.daniel-ir.eu/blog/photorand)
+- **PyPI Package**: [photorand on PyPI](https://pypi.org/project/photorand/)
