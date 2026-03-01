@@ -42,6 +42,8 @@ This project uses `pyproject.toml` for managing dependencies.
 	pip install -e ".[dev]"
 	```
 
+Note: you can use `photorand` from the cli using `python -m photorand` instead of just `photorand`
+
 ---
 
 ### 1. High-Level Classes (Recommended)
@@ -89,16 +91,16 @@ The package includes a powerful CLI to use these classes directly from your term
 
 ```bash
 # Extract 64-byte photorand seed (hex)
-python -m photorand extract path/to/raw_image.ARW
+photorand extract path/to/raw_image.ARW
 
 # Roll a D20
-python -m photorand extract path/to/raw_image.ARW --format range --min 1 --max 20
+photorand extract path/to/raw_image.ARW --format range --min 1 --max 20
 
 # Generate 5 random 16-char alphanumeric passwords
-python -m photorand generate path/to/raw_image.ARW --type string -n 5 -l 16 --charset alpha
+photorand generate path/to/raw_image.ARW --type string -n 5 -l 16 --charset alpha
 ```
 
-*For more details, run:* `python -m photorand --help`
+*For more details, run:* `photorand --help`
 
 ---
 
