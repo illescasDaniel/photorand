@@ -1,7 +1,12 @@
-import rawpy
+from typing import Final
+
 import imageio
+import imageio.v3 as iio
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+import rawpy
+
 
 def extract_noise_map(
 	raw_path: str,
@@ -26,8 +31,8 @@ def extract_noise_map(
 		w: int
 		h, w = raw_data.shape
 
-		start_h: int = h // 2
-		start_w: int = w // 2
+		start_h: Final[int] = h // 2
+		start_w: Final[int] = w // 2
 
 		# We sample a localized grid to demonstrate the lack of spatial correlation
 		# in raw sensor noise.
@@ -58,12 +63,6 @@ def extract_noise_map(
 # Usage: Visualizing the 'Seed' of your TRNG
 extract_noise_map('tests/data/DSC03088.ARW', 'examples/noise/entropy_visualized.png')
 extract_noise_map('tests/data/DSC03089.ARW', 'examples/noise/entropy_visualized_2.png')
-
-import imageio.v3 as iio
-import numpy as np
-import numpy.typing as npt
-import matplotlib.pyplot as plt
-from typing import Final
 
 def create_spectral_entropy_diff(
 	path_a: str,

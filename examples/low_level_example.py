@@ -3,7 +3,7 @@ import os
 from photorand.low_level.csprng import expand_entropy_chacha20
 from photorand.low_level.hash import hash_entropy_pool
 from photorand.low_level.ingest import ingest_raw_image
-from photorand.low_level.sample import sample_entropy_grid
+from photorand.low_level import sample_entropy_grid
 
 
 def main():
