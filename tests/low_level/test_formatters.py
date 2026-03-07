@@ -1,9 +1,13 @@
 import pytest
 
 from photorand.low_level.formatters import (
-	trng_format_hex, trng_format_int, trng_format_range,
-	trng_format_bool, trng_format_float,
-	csprng_format_bool, csprng_format_float
+	csprng_format_bool,
+	csprng_format_float,
+	trng_format_bool,
+	trng_format_float,
+	trng_format_hex,
+	trng_format_int,
+	trng_format_range,
 )
 
 
