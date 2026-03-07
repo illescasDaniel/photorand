@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms
 from ..logger import logger
 
 
-def generate_chacha20_encryptor(raw_seed: bytes, salt: bool = True):
+def generate_chacha20_encryptor(raw_seed: bytes, salt: bool):
 	"""
 	Initializes a ChaCha20 encryptor from a raw seed, optionally applying environmental salting.
 	"""
@@ -33,7 +33,7 @@ def generate_chacha20_encryptor(raw_seed: bytes, salt: bool = True):
 	cipher = Cipher(algorithm, mode=None, backend=default_backend())
 	return cipher.encryptor()
 
-def expand_entropy_chacha20(trng_seed: bytes, num_bytes_needed: int) -> bytes:
+def expand_entropy_chacha20(trng_seed: bytes, num_bytes_needed: int, salt: bool = False) -> bytes:
 	"""
 	Takes a 64-byte photorand seed and uses it to key a ChaCha20 stream cipher,
 	generating an arbitrary amount of Cryptographically Secure Pseudo-Random numbers.
@@ -41,11 +41,12 @@ def expand_entropy_chacha20(trng_seed: bytes, num_bytes_needed: int) -> bytes:
 	Args:
 		trng_seed (bytes): The 64-byte true random output from your hash function.
 		num_bytes_needed (int): How many random bytes you want to generate.
+		salt (bool, optional): Whether to apply environmental salting. Defaults to False.
 
 	Returns:
 		bytes: A highly secure, mathematically random byte string.
 	"""
-	encryptor = generate_chacha20_encryptor(trng_seed, salt=False)
+	encryptor = generate_chacha20_encryptor(trng_seed, salt=salt)
 
 	# 4. Generate the keystream (Encrypting Zeros)
 	# We create a dummy payload of null bytes (0x00) matching the length we need.

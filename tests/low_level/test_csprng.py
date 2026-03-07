@@ -60,6 +60,11 @@ class TestDeterminism:
 		b = expand_entropy_chacha20(seed_b, 64)
 		assert a != b
 
+	def test_salting_produces_different_output_for_same_seed(self):
+		a = expand_entropy_chacha20(SEED_64, 128, salt=False)
+		b = expand_entropy_chacha20(SEED_64, 128, salt=True)
+		assert a != b
+
 	def test_longer_request_is_prefix_of_same_seed(self):
 		"""Requesting N bytes must be a prefix of requesting 2*N bytes."""
 		short = expand_entropy_chacha20(SEED_64, 64)
