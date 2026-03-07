@@ -1,7 +1,5 @@
 from ..logger import logger
-from ..low_level.hash import hash_entropy_pool
-from ..low_level.ingest import ingest_raw_image
-from ..low_level.sample import sample_entropy_grid
+from ..low_level.generate import generate_true_random_number
 
 
 class PhotoRandSeed:
@@ -23,9 +21,7 @@ class PhotoRandSeed:
 		logger.info(f"[PhotoRandSeed] Extracting TRNG entropy from: {image_path}")
 
 		# Reuse existing lower-level functions
-		raw_data = ingest_raw_image(image_path)
-		entropy_pool = sample_entropy_grid(raw_data)
-		self._raw_seed = hash_entropy_pool(entropy_pool)
+		self._raw_seed = generate_true_random_number(image_path)
 
 		logger.info("[PhotoRandSeed] Successfully generated 64-byte seed.")
 
