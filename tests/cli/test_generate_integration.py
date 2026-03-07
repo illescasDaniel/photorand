@@ -44,6 +44,15 @@ def test_extract_integration(image_filename: str, expected_int: int, expected_ra
 	out_range = run_cli_integration(["extract", image_path, "--format", "range", "--min", "10", "--max", "20"], capsys, monkeypatch)
 	assert int(out_range) == expected_range
 
+	# Test bool format
+	out_bool = run_cli_integration(["extract", image_path, "--format", "bool"], capsys, monkeypatch)
+	assert out_bool in ["True", "False"]
+
+	# Test float format
+	out_float = run_cli_integration(["extract", image_path, "--format", "float"], capsys, monkeypatch)
+	f_val = float(out_float)
+	assert 0.0 <= f_val <= 1.0
+
 
 def test_generate_integration(capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch):
 	"""Test the generate subcommand end-to-end with a real image."""
@@ -61,6 +70,20 @@ def test_generate_integration(capsys: pytest.CaptureFixture[str], monkeypatch: p
 	out_str = run_cli_integration(["generate", image_path, "--type", "string", "-n", "1", "-l", "32", "--charset", "hex"], capsys, monkeypatch)
 	assert len(out_str) == 32
 	assert all(c in "0123456789abcdef" for c in out_str)
+
+	# Generate 3 bools
+	out_bools = run_cli_integration(["generate", image_path, "--type", "bool", "-n", "3"], capsys, monkeypatch)
+	lines_bool = out_bools.splitlines()
+	assert len(lines_bool) == 3
+	for line in lines_bool:
+		assert line in ["True", "False"]
+
+	# Generate 3 floats
+	out_floats = run_cli_integration(["generate", image_path, "--type", "float", "-n", "3"], capsys, monkeypatch)
+	lines_float = out_floats.splitlines()
+	assert len(lines_float) == 3
+	for line in lines_float:
+		assert 0.0 <= float(line) <= 1.0
 
 
 def test_generate_deterministic(capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch):

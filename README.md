@@ -80,6 +80,8 @@ engine = PhotoRandEngine("path/to/image.raw")
 key = engine.next_bytes(32)
 pin = engine.next_string(length=6, charset='numeric')
 dice = engine.next_int_range(1, 20)
+coin_flip = engine.next_bool()
+probability = engine.next_float()
 
 # 3. Batch generation
 multiple_passwords = engine.generate_batch(engine.next_string, count=5, length=16)
@@ -98,6 +100,12 @@ photorand extract path/to/raw_image.ARW --format range --min 1 --max 20
 
 # Generate 5 random 16-char alphanumeric passwords
 photorand generate path/to/raw_image.ARW --type string -n 5 -l 16 --charset alpha
+
+# Extract a floating point number between 0 and 1
+photorand extract path/to/raw_image.ARW --format float
+
+# Generate 10 boolean values
+photorand generate path/to/raw_image.ARW --type bool -n 10
 ```
 
 *For more details, run:* `photorand --help`

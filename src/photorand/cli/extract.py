@@ -28,6 +28,10 @@ def handle_extract(args: argparse.Namespace, parser: argparse.ArgumentParser):
 		result = seed.to_int()
 	elif args.format == "range":
 		result = seed.to_int_range(args.min, args.max)
+	elif args.format == "bool":
+		result = seed.to_bool()
+	elif args.format == "float":
+		result = seed.to_float()
 	else:
 		raise ValueError(f"Unknown format: {args.format}")
 

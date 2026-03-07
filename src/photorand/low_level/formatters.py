@@ -99,3 +99,45 @@ def csprng_format_range(
 		block = csprng_stream[i * chunk : (i + 1) * chunk]
 		results.append(str(trng_format_range(block, min_val, max_val)))
 	return results
+
+
+def trng_format_bool(entropy: bytes) -> bool:
+	"""
+	Converts raw TRNG bytes to a single boolean value.
+	"""
+	return (entropy[0] & 1) == 1
+
+
+def trng_format_float(entropy: bytes) -> float:
+	"""
+	Converts raw TRNG bytes to a floating point number between 0.0 and 1.0 (inclusive).
+	"""
+	# Use 53 bits for Python float precision
+	val = int.from_bytes(entropy[:7], byteorder="big") & 0x1FFFFFFFFFFFFF
+	return val / 0x1FFFFFFFFFFFFF
+
+
+def csprng_format_bool(csprng_stream: bytes, count: int) -> list[str]:
+	"""
+	Format raw CSPRNG bytes as a list of boolean strings.
+	"""
+	results = []
+	for i in range(count):
+		results.append(str((csprng_stream[i] & 1) == 1))
+	return results
+
+
+def csprng_format_float(csprng_stream: bytes, count: int) -> list[str]:
+	"""
+	Format raw CSPRNG bytes as a list of float strings (0.0 to 1.0 inclusive).
+	"""
+	chunk = 7
+	results = []
+	for i in range(count):
+		block = csprng_stream[i * chunk : (i + 1) * chunk]
+		# Fallback if stream is too short, though it should be sized correctly by engine
+		if len(block) < chunk:
+			block = block.ljust(chunk, b'\x00')
+		val = int.from_bytes(block, "big") & 0x1FFFFFFFFFFFFF
+		results.append(str(val / 0x1FFFFFFFFFFFFF))
+	return results

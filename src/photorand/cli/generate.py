@@ -49,6 +49,12 @@ def handle_generate(args: argparse.Namespace, parser: argparse.ArgumentParser):
 			str(engine.next_int_range(args.min, args.max)) for _ in range(args.count)
 		]
 
+	elif args.type == "bool":
+		results = [str(engine.next_bool()) for _ in range(args.count)]
+
+	elif args.type == "float":
+		results = [str(engine.next_float()) for _ in range(args.count)]
+
 	output = "\n".join(results)
 
 	if args.out:

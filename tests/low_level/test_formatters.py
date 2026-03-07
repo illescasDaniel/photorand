@@ -1,6 +1,10 @@
 import pytest
 
-from photorand.low_level.formatters import trng_format_hex, trng_format_int, trng_format_range
+from photorand.low_level.formatters import (
+	trng_format_hex, trng_format_int, trng_format_range,
+	trng_format_bool, trng_format_float,
+	csprng_format_bool, csprng_format_float
+)
 
 
 def test_format_hex():
@@ -46,3 +50,27 @@ def test_format_range_exhaustion():
 	entropy = b"\xc8"  # 200
 	with pytest.raises(RuntimeError):
 		trng_format_range(entropy, 1, 100)
+
+
+def test_format_bool():
+	assert trng_format_bool(b"\x00") is False
+	assert trng_format_bool(b"\x01") is True
+	assert trng_format_bool(b"\x02") is False
+
+
+def test_format_float():
+	# 7 bytes of \x00 -> 0.0
+	assert trng_format_float(b"\x00" * 7) == 0.0
+	# Max 53 bits -> \x1f\xff\xff\xff\xff\xff\xff -> 1.0
+	assert trng_format_float(b"\x1f" + b"\xff" * 6) == 1.0
+
+
+def test_csprng_format_bool():
+	res = csprng_format_bool(b"\x00\x01\x02", 3)
+	assert res == ["False", "True", "False"]
+
+
+def test_csprng_format_float():
+	stream = (b"\x00" * 7) + (b"\xff" * 7)
+	res = csprng_format_float(stream, 2)
+	assert res == ["0.0", "1.0"]

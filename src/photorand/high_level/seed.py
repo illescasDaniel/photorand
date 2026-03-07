@@ -94,10 +94,28 @@ class PhotoRandSeed:
 
 		if large_int < limit:
 			return min_val + (large_int % range_size)
-		else:
-			# The purist TRNG exhaustion exception
-			raise RuntimeError(
-				f"TRNG Exhaustion: The physical entropy from the image fell into the "
-				f"rejection zone (value >= {limit}). To maintain strict TRNG purity, "
-				f"no PRNG fallback was used. Please extract a seed from a new image."
-			)
+		raise RuntimeError(
+			f"TRNG Exhaustion: The physical entropy from the image fell into the "
+			f"rejection zone (value >= {limit}). To maintain strict TRNG purity, "
+			f"no PRNG fallback was used. Please extract a seed from a new image."
+		)
+
+	def to_bool(self) -> bool:
+		"""
+		Converts the exact pure TRNG seed into a single boolean value.
+
+		Returns:
+			bool: True or False.
+		"""
+		return (self._raw_seed[0] & 1) == 1
+
+	def to_float(self) -> float:
+		"""
+		Converts the TRNG seed into a floating point number between 0.0 and 1.0 (inclusive).
+
+		Returns:
+			float: Random float in [0.0, 1.0].
+		"""
+		# Use 53 bits for standard IEEE 754 double precision float
+		val = int.from_bytes(self._raw_seed[:7], byteorder="big") & 0x1FFFFFFFFFFFFF
+		return val / 0x1FFFFFFFFFFFFF

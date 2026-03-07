@@ -23,9 +23,9 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 	)
 	extract_parser.add_argument(
 		"--format",
-		choices=["hex", "int", "range"],
+		choices=["hex", "int", "range", "bool", "float"],
 		default="hex",
-		help="Output format: hex (default), int, or range.",
+		help="Output format: hex (default), int, range, bool, or float.",
 	)
 	extract_parser.add_argument(
 		"--min",
@@ -65,7 +65,7 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 	)
 	generate_parser.add_argument(
 		"--type",
-		choices=["bytes", "int", "string", "range"],
+		choices=["bytes", "int", "string", "range", "bool", "float"],
 		required=True,
 		help="Type of data to generate.",
 	)

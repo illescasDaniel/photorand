@@ -163,6 +163,18 @@ class PhotoRandEngine:
 		# We can extract 1 bit, or just check if one byte is odd
 		return (self._get_bytes(1)[0] & 1) == 1
 
+	def next_float(self) -> float:
+		"""
+		Generates a random float between 0.0 and 1.0 (inclusive).
+
+		Returns:
+			float: Random float in [0.0, 1.0].
+		"""
+		# 53 bits for precision
+		raw_bytes = self._get_bytes(7)
+		val = int.from_bytes(raw_bytes, byteorder="big") & 0x1FFFFFFFFFFFFF
+		return val / 0x1FFFFFFFFFFFFF
+
 	def generate_batch(self, type_func: Callable, n: int, **kwargs) -> List:
 		"""
 		Generates a list of n items using one of the generation methods.

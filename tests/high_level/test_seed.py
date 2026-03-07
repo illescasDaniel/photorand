@@ -40,3 +40,12 @@ class TestPhotoRandSeed:
 		for _ in range(10):
 			val = seed.to_int_range(100, 200)
 			assert 100 <= val <= 200
+
+	def test_to_bool_and_float(self):
+		"""Verify bool and float generation."""
+		seed = PhotoRandSeed(TEST_IMAGE)
+		val_bool = seed.to_bool()
+		assert isinstance(val_bool, bool)
+		val_float = seed.to_float()
+		assert isinstance(val_float, float)
+		assert 0.0 <= val_float <= 1.0

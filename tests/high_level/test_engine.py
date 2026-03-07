@@ -105,6 +105,18 @@ class TestPhotoRandEngine:
 		results = set(engine.next_bool() for _ in range(100))
 		assert {True, False} == results
 
+	def test_next_float(self):
+		"""Verify float generation."""
+		engine = PhotoRandEngine(TEST_IMAGE)
+		val_float = engine.next_float()
+		assert isinstance(val_float, float)
+		assert 0.0 <= val_float <= 1.0
+
+		# Batch of floats
+		batch = engine.generate_batch(engine.next_float, 20)
+		assert len(batch) == 20
+		assert all(isinstance(f, float) and 0.0 <= f <= 1.0 for f in batch)
+
 	def test_generate_batch(self):
 		"""Verify the batch helper method."""
 		engine = PhotoRandEngine(TEST_IMAGE)

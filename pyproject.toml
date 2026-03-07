@@ -23,7 +23,9 @@ photorand = "photorand.cli.main:main"
 Homepage = "https://github.com/illescasDaniel/photorand"
 
 [project.optional-dependencies]
-dev = ["pytest", "ruff", "vermin", "build", "imageio", "matplotlib"]
+dev = ["pytest", "ruff"]
+build = ["vermin", "build", "twine"]
+examples = ["imageio", "matplotlib"]
 
 # --- RUFF (Linter & Import Sorter) ---
 [tool.ruff]
