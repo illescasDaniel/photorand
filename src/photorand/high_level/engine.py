@@ -1,13 +1,7 @@
-import hashlib
-import os
 import string
-import time
 from typing import Callable, List, Union
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms
-
-from ..logger import logger
+from ..low_level.csprng import generate_chacha20_encryptor
 from .seed import PhotoRandSeed
 
 
@@ -37,28 +31,8 @@ class PhotoRandEngine:
 
 		raw_seed = self.seed.to_bytes()
 
-		if salt:
-			# Salting Logic: [Camera Seed] + [Time] + [PID]
-			timestamp = str(time.time_ns()).encode()
-			pid = str(os.getpid()).encode()
-			combined = raw_seed + timestamp + pid
-			session_hash = hashlib.sha3_512(combined).digest()
-			logger.info("[PhotoRandEngine] CSPRNG initialized with salted session key.")
-		else:
-			# Deterministic Mode: Use the raw 64-byte seed directly
-			session_hash = raw_seed
-			logger.info("[PhotoRandEngine] CSPRNG initialized in deterministic mode.")
 
-		# Split hash into ChaCha20 key (32 bytes) and nonce (16 bytes)
-		# We have 64 bytes total from SHA3-512 (salted) or PhotoRandSeed (deterministic).
-		key = session_hash[:32]
-		nonce = session_hash[32:48]
-
-		self._algorithm = algorithms.ChaCha20(key, nonce)
-		self._cipher = Cipher(self._algorithm, mode=None, backend=default_backend())
-		self._encryptor = self._cipher.encryptor()
-
-		logger.info("[PhotoRandEngine] CSPRNG initialized with salted session key.")
+		self._encryptor = generate_chacha20_encryptor(raw_seed, salt=salt)
 
 	def _get_bytes(self, n: int) -> bytes:
 		"""
