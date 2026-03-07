@@ -66,10 +66,23 @@ def test_generate_integration(capsys: pytest.CaptureFixture[str], monkeypatch: p
 	for line in lines:
 		int(line)  # Valid integer
 
+	# Generate integers with specific digits
+	out_digits = run_cli_integration(["generate", image_path, "--type", "int", "--digits", "100", "-n", "2"], capsys, monkeypatch)
+	lines_digits = out_digits.splitlines()
+	assert len(lines_digits) == 2
+	for line in lines_digits:
+		assert len(line) == 100
+		int(line)
+
 	# Generate a specific string
 	out_str = run_cli_integration(["generate", image_path, "--type", "string", "-n", "1", "-l", "32", "--charset", "hex"], capsys, monkeypatch)
 	assert len(out_str) == 32
 	assert all(c in "0123456789abcdef" for c in out_str)
+
+	# Generate string with numeric-only
+	out_num_str = run_cli_integration(["generate", image_path, "--type", "string", "-n", "1", "-l", "32", "--numeric-only"], capsys, monkeypatch)
+	assert len(out_num_str) == 32
+	assert out_num_str.isdigit()
 
 	# Generate 3 bools
 	out_bools = run_cli_integration(["generate", image_path, "--type", "bool", "-n", "3"], capsys, monkeypatch)

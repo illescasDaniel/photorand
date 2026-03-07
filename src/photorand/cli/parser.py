@@ -78,7 +78,12 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 	generate_parser.add_argument(
 		"-l", "--length",
 		type=int,
-		help="Size of each item (bytes, digits, or characters depending on --type).",
+		help="Size of each item (bytes for int/bytes, characters for string). Does not set digits for int.",
+	)
+	generate_parser.add_argument(
+		"--digits",
+		type=int,
+		help="Number of decimal digits (only applies when --type is 'int').",
 	)
 	generate_parser.add_argument(
 		"--min",
@@ -95,6 +100,11 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 		choices=["ascii", "hex", "alpha", "all"],
 		default="all",
 		help="Character set to use when --type is 'string' (default: all).",
+	)
+	generate_parser.add_argument(
+		"--numeric-only",
+		action="store_true",
+		help="Only use numbers when generating strings (equivalent to --charset numeric).",
 	)
 	generate_parser.add_argument(
 		"-o", "--out",

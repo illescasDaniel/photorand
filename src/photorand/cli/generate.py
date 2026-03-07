@@ -33,14 +33,30 @@ def handle_generate(args: argparse.Namespace, parser: argparse.ArgumentParser):
 		]
 
 	elif args.type == "int":
-		results = [
-			str(engine.next_int(args.length if args.length else 8))
-			for _ in range(args.count)
-		]
+		original_limit = sys.get_int_max_str_digits()
+		needed_digits = args.digits if args.digits else (args.length if args.length else 8) * 3
+
+		if needed_digits > original_limit:
+			sys.set_int_max_str_digits(needed_digits)
+
+		try:
+			if args.digits:
+				results = [
+					str(engine.next_int_digits(args.digits))
+					for _ in range(args.count)
+				]
+			else:
+				results = [
+					str(engine.next_int(args.length if args.length else 8))
+					for _ in range(args.count)
+				]
+		finally:
+			sys.set_int_max_str_digits(original_limit)
 
 	elif args.type == "string":
+		charset = "numeric" if args.numeric_only else args.charset
 		results = [
-			engine.next_string(args.length if args.length else 16, args.charset)
+			engine.next_string(args.length if args.length else 16, charset)
 			for _ in range(args.count)
 		]
 

@@ -61,6 +61,23 @@ class TestPhotoRandEngine:
 		val64 = engine.next_int(length=8)
 		assert 0 <= val64 < (1 << 64)
 
+	def test_next_int_digits(self):
+		"""Verify integer generation with specific number of decimal digits."""
+		engine = PhotoRandEngine(TEST_IMAGE)
+
+		# 5-digit int
+		val5 = engine.next_int_digits(digits=5)
+		assert len(str(val5)) == 5
+		
+		# 1-digit int
+		val1 = engine.next_int_digits(digits=1)
+		assert len(str(val1)) == 1
+		assert 0 <= val1 <= 9
+
+		# Large digit int (e.g., 100 digits)
+		val100 = engine.next_int_digits(digits=100)
+		assert len(str(val100)) == 100
+
 	def test_next_int_range(self):
 		"""Verify range-bounded integer generation with rejection sampling."""
 		engine = PhotoRandEngine(TEST_IMAGE)

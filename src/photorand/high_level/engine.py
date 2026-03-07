@@ -90,13 +90,29 @@ class PhotoRandEngine:
 		Generates an integer with the specified number of bytes length.
 
 		Args:
-			length (int): Number of bytes to use for the integer. Defaults to 8 (64 bits).
+			length (int): Number of bytes (not digits) to use for the integer. Defaults to 8 (64 bits).
 
 		Returns:
 			int: A random integer.
 		"""
 		raw_bytes = self._get_bytes(length)
 		return int.from_bytes(raw_bytes, byteorder="big")
+
+	def next_int_digits(self, digits: int) -> int:
+		"""
+		Generates a random integer with exactly the specified number of decimal digits.
+
+		Args:
+			digits (int): The number of decimal digits for the generated integer.
+
+		Returns:
+			int: A random integer with the specified number of digits.
+		"""
+		if digits <= 0:
+			raise ValueError("digits must be greater than 0")
+		min_val = 10 ** (digits - 1) if digits > 1 else 0
+		max_val = (10 ** digits) - 1
+		return self.next_int_range(min_val, max_val)
 
 	def next_int_range(self, min_val: int, max_val: int) -> int:
 		"""
