@@ -93,19 +93,19 @@ The package includes a powerful CLI to use these classes directly from your term
 
 ```bash
 # Extract 64-byte photorand seed (hex)
-photorand extract path/to/raw_image.ARW
+photorand extract hex --from path/to/raw_image.ARW
 
 # Roll a D20
-photorand extract path/to/raw_image.ARW --format range --min 1 --max 20
+photorand extract range --from path/to/raw_image.ARW --min 1 --max 20
 
 # Generate 5 random 16-char alphanumeric passwords
-photorand generate path/to/raw_image.ARW --type string -n 5 -l 16 --charset alpha
+photorand generate string --from path/to/raw_image.ARW -n 5 -l 16 --charset alpha
 
 # Extract a floating point number between 0 and 1
-photorand extract path/to/raw_image.ARW --format float
+photorand extract float --from path/to/raw_image.ARW
 
 # Generate 10 boolean values
-photorand generate path/to/raw_image.ARW --type bool -n 10
+photorand generate bool --from path/to/raw_image.ARW -n 10
 ```
 
 *For more details, run:* `photorand --help`

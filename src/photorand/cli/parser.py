@@ -7,8 +7,62 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 	parser = argparse.ArgumentParser(
 		description="photorand: True Random & Cryptographically Secure number generation from RAW images.",
 	)
-
 	subparsers = parser.add_subparsers(dest="command", required=True)
+
+	# ------------------------------------------------------------------
+	# Common Arguments
+	# ------------------------------------------------------------------
+	extract_common = argparse.ArgumentParser(add_help=False)
+	extract_common.add_argument(
+		"--from", "--file", "-f", "--input",
+		dest="image_path",
+		required=True,
+		help="Path to the RAW image file (e.g., .ARW, .CR2).",
+	)
+	extract_common.add_argument(
+		"-o", "--out", "--to",
+		dest="out",
+		help="File path to save output. Omit to print to stdout.",
+	)
+	extract_common.add_argument(
+		"--binary",
+		action="store_true",
+		help="Write raw binary bytes when saving to a file (requires --out).",
+	)
+	extract_common.add_argument(
+		"-v", "--verbose",
+		action="store_true",
+		help="Enable verbose logging.",
+	)
+
+	generate_common = argparse.ArgumentParser(add_help=False)
+	generate_common.add_argument(
+		"--from", "--file", "-f", "--input",
+		dest="image_path",
+		required=True,
+		help="Path to the RAW image file (e.g., .ARW, .CR2).",
+	)
+	generate_common.add_argument(
+		"-n", "--count",
+		type=int,
+		default=1,
+		help="Number of items to generate (default: 1).",
+	)
+	generate_common.add_argument(
+		"-o", "--out", "--to",
+		dest="out",
+		help="File path to save output. Omit to print to stdout.",
+	)
+	generate_common.add_argument(
+		"--deterministic",
+		action="store_true",
+		help="Produce a reproducible sequence by skipping environmental salting.",
+	)
+	generate_common.add_argument(
+		"-v", "--verbose",
+		action="store_true",
+		help="Enable verbose logging.",
+	)
 
 	# ------------------------------------------------------------------
 	# 'extract' subcommand
@@ -17,40 +71,16 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 		"extract",
 		help="Extract 64 bytes of true physical entropy from a RAW image.",
 	)
-	extract_parser.add_argument(
-		"image_path",
-		help="Path to the RAW image file (e.g., .ARW, .CR2).",
-	)
-	extract_parser.add_argument(
-		"--format",
-		choices=["hex", "int", "range", "bool", "float"],
-		default="hex",
-		help="Output format: hex (default), int, range, bool, or float.",
-	)
-	extract_parser.add_argument(
-		"--min",
-		type=int,
-		help="Lower bound (required when --format is 'range').",
-	)
-	extract_parser.add_argument(
-		"--max",
-		type=int,
-		help="Upper bound (required when --format is 'range').",
-	)
-	extract_parser.add_argument(
-		"--out",
-		help="File path to save output. Omit to print to stdout.",
-	)
-	extract_parser.add_argument(
-		"--binary",
-		action="store_true",
-		help="Write raw binary bytes when saving to a file (requires --out).",
-	)
-	extract_parser.add_argument(
-		"-v", "--verbose",
-		action="store_true",
-		help="Enable verbose logging.",
-	)
+	extract_subparsers = extract_parser.add_subparsers(dest="format", required=True)
+	
+	extract_subparsers.add_parser("hex", parents=[extract_common], help="Output as hex string")
+	extract_subparsers.add_parser("int", parents=[extract_common], help="Output as large integer")
+	extract_subparsers.add_parser("bool", parents=[extract_common], help="Output as boolean")
+	extract_subparsers.add_parser("float", parents=[extract_common], help="Output as float between 0 and 1")
+	
+	extract_range = extract_subparsers.add_parser("range", parents=[extract_common], help="Output integer in range")
+	extract_range.add_argument("--min", type=int, required=True, help="Lower bound")
+	extract_range.add_argument("--max", type=int, required=True, help="Upper bound")
 
 	# ------------------------------------------------------------------
 	# 'generate' subcommand
@@ -59,66 +89,25 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 		"generate",
 		help="Generate arbitrary amounts of CSPRNG data seeded by a RAW image.",
 	)
-	generate_parser.add_argument(
-		"image_path",
-		help="Path to the RAW image file (e.g., .ARW, .CR2).",
-	)
-	generate_parser.add_argument(
-		"--type",
-		choices=["bytes", "int", "string", "range", "bool", "float"],
-		required=True,
-		help="Type of data to generate.",
-	)
-	generate_parser.add_argument(
-		"-n", "--count",
-		type=int,
-		default=1,
-		help="Number of items to generate (default: 1).",
-	)
-	generate_parser.add_argument(
-		"-l", "--length",
-		type=int,
-		help="Size of each item (bytes for int/bytes, characters for string). Does not set digits for int.",
-	)
-	generate_parser.add_argument(
-		"--digits",
-		type=int,
-		help="Number of decimal digits (only applies when --type is 'int').",
-	)
-	generate_parser.add_argument(
-		"--min",
-		type=int,
-		help="Lower bound (required when --type is 'range').",
-	)
-	generate_parser.add_argument(
-		"--max",
-		type=int,
-		help="Upper bound (required when --type is 'range').",
-	)
-	generate_parser.add_argument(
-		"--charset",
-		choices=["ascii", "hex", "alpha", "all"],
-		default="all",
-		help="Character set to use when --type is 'string' (default: all).",
-	)
-	generate_parser.add_argument(
-		"--numeric-only",
-		action="store_true",
-		help="Only use numbers when generating strings (equivalent to --charset numeric).",
-	)
-	generate_parser.add_argument(
-		"-o", "--out",
-		help="File path to save output. Omit to print to stdout.",
-	)
-	generate_parser.add_argument(
-		"--deterministic",
-		action="store_true",
-		help="Produce a reproducible sequence by skipping environmental salting.",
-	)
-	generate_parser.add_argument(
-		"-v", "--verbose",
-		action="store_true",
-		help="Enable verbose logging.",
-	)
+	gen_subparsers = generate_parser.add_subparsers(dest="type", required=True)
+
+	gen_bytes = gen_subparsers.add_parser("bytes", parents=[generate_common], help="Generate random bytes")
+	gen_bytes.add_argument("-l", "--length", type=int, help="Size of each item in bytes")
+
+	gen_int = gen_subparsers.add_parser("int", parents=[generate_common], help="Generate random integers")
+	gen_int.add_argument("-l", "--length", type=int, help="Size of each item in bytes. Does not set digits for int.")
+	gen_int.add_argument("--digits", type=int, help="Number of decimal digits")
+
+	gen_string = gen_subparsers.add_parser("string", parents=[generate_common], help="Generate random strings")
+	gen_string.add_argument("-l", "--length", type=int, help="Size of each item in characters")
+	gen_string.add_argument("--charset", choices=["ascii", "hex", "alpha", "all"], default="all", help="Character set to use (default: all)")
+	gen_string.add_argument("--numeric-only", action="store_true", help="Only use numbers when generating strings")
+
+	gen_range = gen_subparsers.add_parser("range", parents=[generate_common], help="Generate random integers in range")
+	gen_range.add_argument("--min", type=int, required=True, help="Lower bound")
+	gen_range.add_argument("--max", type=int, required=True, help="Upper bound")
+
+	gen_subparsers.add_parser("bool", parents=[generate_common], help="Generate random booleans")
+	gen_subparsers.add_parser("float", parents=[generate_common], help="Generate random floats between 0 and 1")
 
 	return parser, extract_parser, generate_parser

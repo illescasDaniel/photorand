@@ -7,10 +7,6 @@ from ..logger import logger
 
 def handle_extract(args: argparse.Namespace, parser: argparse.ArgumentParser):
 	"""Handle the 'extract' subcommand: extract 64 bytes of true physical entropy."""
-	# Validate range arguments
-	if args.format == "range":
-		if args.min is None or args.max is None:
-			parser.error("--min and --max are required when --format is 'range'")
 
 	try:
 		seed = PhotoRandSeed(args.image_path)

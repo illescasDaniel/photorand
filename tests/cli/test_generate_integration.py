@@ -33,23 +33,23 @@ def test_extract_integration(image_filename: str, expected_int: int, expected_ra
 	image_path = str(image_file)
 
 	# Test hex format (default)
-	out_hex = run_cli_integration(["extract", image_path], capsys, monkeypatch)
+	out_hex = run_cli_integration(["extract", "hex", "--from", image_path], capsys, monkeypatch)
 	assert len(out_hex) == 128  # 64 bytes * 2 chars/byte
 
 	# Test int format
-	out_int = run_cli_integration(["extract", image_path, "--format", "int"], capsys, monkeypatch)
+	out_int = run_cli_integration(["extract", "int", "--from", image_path], capsys, monkeypatch)
 	assert int(out_int) == expected_int
 
 	# Test range format
-	out_range = run_cli_integration(["extract", image_path, "--format", "range", "--min", "10", "--max", "20"], capsys, monkeypatch)
+	out_range = run_cli_integration(["extract", "range", "--from", image_path, "--min", "10", "--max", "20"], capsys, monkeypatch)
 	assert int(out_range) == expected_range
 
 	# Test bool format
-	out_bool = run_cli_integration(["extract", image_path, "--format", "bool"], capsys, monkeypatch)
+	out_bool = run_cli_integration(["extract", "bool", "--from", image_path], capsys, monkeypatch)
 	assert out_bool in ["True", "False"]
 
 	# Test float format
-	out_float = run_cli_integration(["extract", image_path, "--format", "float"], capsys, monkeypatch)
+	out_float = run_cli_integration(["extract", "float", "--from", image_path], capsys, monkeypatch)
 	f_val = float(out_float)
 	assert 0.0 <= f_val <= 1.0
 
@@ -60,14 +60,14 @@ def test_generate_integration(capsys: pytest.CaptureFixture[str], monkeypatch: p
 	image_path = str(base_dir / "data" / "DSC02111.ARW")
 
 	# Generate 5 integers
-	out = run_cli_integration(["generate", image_path, "--type", "int", "-n", "5"], capsys, monkeypatch)
+	out = run_cli_integration(["generate", "int", "--from", image_path, "-n", "5"], capsys, monkeypatch)
 	lines = out.splitlines()
 	assert len(lines) == 5
 	for line in lines:
 		int(line)  # Valid integer
 
 	# Generate integers with specific digits
-	out_digits = run_cli_integration(["generate", image_path, "--type", "int", "--digits", "100", "-n", "2"], capsys, monkeypatch)
+	out_digits = run_cli_integration(["generate", "int", "--from", image_path, "--digits", "100", "-n", "2"], capsys, monkeypatch)
 	lines_digits = out_digits.splitlines()
 	assert len(lines_digits) == 2
 	for line in lines_digits:
@@ -75,24 +75,24 @@ def test_generate_integration(capsys: pytest.CaptureFixture[str], monkeypatch: p
 		int(line)
 
 	# Generate a specific string
-	out_str = run_cli_integration(["generate", image_path, "--type", "string", "-n", "1", "-l", "32", "--charset", "hex"], capsys, monkeypatch)
+	out_str = run_cli_integration(["generate", "string", "--from", image_path, "-n", "1", "-l", "32", "--charset", "hex"], capsys, monkeypatch)
 	assert len(out_str) == 32
 	assert all(c in "0123456789abcdef" for c in out_str)
 
 	# Generate string with numeric-only
-	out_num_str = run_cli_integration(["generate", image_path, "--type", "string", "-n", "1", "-l", "32", "--numeric-only"], capsys, monkeypatch)
+	out_num_str = run_cli_integration(["generate", "string", "--from", image_path, "-n", "1", "-l", "32", "--numeric-only"], capsys, monkeypatch)
 	assert len(out_num_str) == 32
 	assert out_num_str.isdigit()
 
 	# Generate 3 bools
-	out_bools = run_cli_integration(["generate", image_path, "--type", "bool", "-n", "3"], capsys, monkeypatch)
+	out_bools = run_cli_integration(["generate", "bool", "--from", image_path, "-n", "3"], capsys, monkeypatch)
 	lines_bool = out_bools.splitlines()
 	assert len(lines_bool) == 3
 	for line in lines_bool:
 		assert line in ["True", "False"]
 
 	# Generate 3 floats
-	out_floats = run_cli_integration(["generate", image_path, "--type", "float", "-n", "3"], capsys, monkeypatch)
+	out_floats = run_cli_integration(["generate", "float", "--from", image_path, "-n", "3"], capsys, monkeypatch)
 	lines_float = out_floats.splitlines()
 	assert len(lines_float) == 3
 	for line in lines_float:
@@ -105,10 +105,10 @@ def test_generate_deterministic(capsys: pytest.CaptureFixture[str], monkeypatch:
 	image_path = str(base_dir / "data" / "DSC02111.ARW")
 
 	# Run 1
-	out1 = run_cli_integration(["generate", image_path, "--type", "int", "-n", "10", "--deterministic"], capsys, monkeypatch)
+	out1 = run_cli_integration(["generate", "int", "--from", image_path, "-n", "10", "--deterministic"], capsys, monkeypatch)
 
 	# Run 2
-	out2 = run_cli_integration(["generate", image_path, "--type", "int", "-n", "10", "--deterministic"], capsys, monkeypatch)
+	out2 = run_cli_integration(["generate", "int", "--from", image_path, "-n", "10", "--deterministic"], capsys, monkeypatch)
 
 	assert out1 == out2
 	assert len(out1.splitlines()) == 10
@@ -120,10 +120,10 @@ def test_generate_nondeterministic(capsys: pytest.CaptureFixture[str], monkeypat
 	image_path = str(base_dir / "data" / "DSC02111.ARW")
 
 	# Run 1
-	out1 = run_cli_integration(["generate", image_path, "--type", "int", "-n", "10"], capsys, monkeypatch)
+	out1 = run_cli_integration(["generate", "int", "--from", image_path, "-n", "10"], capsys, monkeypatch)
 
 	# Run 2
-	out2 = run_cli_integration(["generate", image_path, "--type", "int", "-n", "10"], capsys, monkeypatch)
+	out2 = run_cli_integration(["generate", "int", "--from", image_path, "-n", "10"], capsys, monkeypatch)
 
 	# It is statistically impossible (1 in ~2^512) for these to match
 	assert out1 != out2

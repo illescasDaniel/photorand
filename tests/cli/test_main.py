@@ -86,23 +86,23 @@ class TestExtractStdout:
 	"""extract writes formatted entropy to stdout."""
 
 	def test_hex_is_default(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
-		out = run_cli(["extract", "fake.arw"], monkeypatch, capsys)
+		out = run_cli(["extract", "hex", "--from", "fake.arw"], monkeypatch, capsys)
 		# hex of bytes(range(64)) starts with 00010203...
 		assert out.out.strip() == MOCK_SEED.hex()
 
 	def test_explicit_hex_format(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
-		out = run_cli(["extract", "fake.arw", "--format", "hex"], monkeypatch, capsys)
+		out = run_cli(["extract", "hex", "--from", "fake.arw"], monkeypatch, capsys)
 		assert out.out.strip() == MOCK_SEED.hex()
 
 	def test_int_format(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
-		out = run_cli(["extract", "fake.arw", "--format", "int"], monkeypatch, capsys)
+		out = run_cli(["extract", "int", "--from", "fake.arw"], monkeypatch, capsys)
 		expected = int.from_bytes(MOCK_SEED, "big")
 		assert int(out.out.strip()) == expected
 
 	def test_range_format(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		# First byte of MOCK_SEED is 0x00 → candidate 0 → 0 % 11 = 0 → result 10
 		out = run_cli(
-			["extract", "fake.arw", "--format", "range", "--min", "10", "--max", "20"],
+			["extract", "range", "--from", "fake.arw", "--min", "10", "--max", "20"],
 			monkeypatch,
 			capsys,
 		)
@@ -120,7 +120,7 @@ class TestExtractFileOutput:
 	def test_text_file_int(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path):
 		out_file = tmp_path / "result.txt"
 		run_cli(
-			["extract", "fake.arw", "--format", "int", "--out", str(out_file)],
+			["extract", "int", "--from", "fake.arw", "--out", str(out_file)],
 			monkeypatch,
 			capsys,
 		)
@@ -130,7 +130,7 @@ class TestExtractFileOutput:
 	def test_text_file_hex(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path):
 		out_file = tmp_path / "result.txt"
 		run_cli(
-			["extract", "fake.arw", "--format", "hex", "--out", str(out_file)],
+			["extract", "hex", "--from", "fake.arw", "--out", str(out_file)],
 			monkeypatch,
 			capsys,
 		)
@@ -139,7 +139,7 @@ class TestExtractFileOutput:
 	def test_binary_file(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path):
 		out_file = tmp_path / "result.bin"
 		run_cli(
-			["extract", "fake.arw", "--out", str(out_file), "--binary"],
+			["extract", "hex", "--from", "fake.arw", "--out", str(out_file), "--binary"],
 			monkeypatch,
 			capsys,
 		)
@@ -148,7 +148,7 @@ class TestExtractFileOutput:
 	def test_text_file_nothing_on_stdout(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path):
 		out_file = tmp_path / "result.txt"
 		out = run_cli(
-			["extract", "fake.arw", "--out", str(out_file)],
+			["extract", "hex", "--from", "fake.arw", "--out", str(out_file)],
 			monkeypatch,
 			capsys,
 		)
@@ -164,7 +164,7 @@ class TestExtractValidation:
 
 	def test_range_without_min_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["extract", "fake.arw", "--format", "range", "--max", "20"],
+			["extract", "range", "--from", "fake.arw", "--max", "20"],
 			monkeypatch,
 			capsys,
 		)
@@ -172,7 +172,7 @@ class TestExtractValidation:
 
 	def test_range_without_max_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["extract", "fake.arw", "--format", "range", "--min", "10"],
+			["extract", "range", "--from", "fake.arw", "--min", "10"],
 			monkeypatch,
 			capsys,
 		)
@@ -180,14 +180,14 @@ class TestExtractValidation:
 
 	def test_range_without_both_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["extract", "fake.arw", "--format", "range"],
+			["extract", "range", "--from", "fake.arw"],
 			monkeypatch,
 			capsys,
 		)
 		assert "error" in out.err.lower()
 
 	def test_missing_image_path_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
-		out = run_cli(["extract"], monkeypatch, capsys)
+		out = run_cli(["extract", "hex"], monkeypatch, capsys)
 		assert "error" in out.err.lower()
 
 
@@ -200,7 +200,7 @@ class TestGenerateStdout:
 
 	def test_bytes_type(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "bytes", "-n", "2", "-l", "4"],
+			["generate", "bytes", "--from", "fake.arw", "-n", "2", "-l", "4"],
 			monkeypatch,
 			capsys,
 		)
@@ -213,7 +213,7 @@ class TestGenerateStdout:
 
 	def test_int_type(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "int", "-n", "3"],
+			["generate", "int", "--from", "fake.arw", "-n", "3"],
 			monkeypatch,
 			capsys,
 		)
@@ -224,7 +224,7 @@ class TestGenerateStdout:
 
 	def test_string_type(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "string", "-n", "2", "-l", "8"],
+			["generate", "string", "--from", "fake.arw", "-n", "2", "-l", "8"],
 			monkeypatch,
 			capsys,
 		)
@@ -235,7 +235,7 @@ class TestGenerateStdout:
 
 	def test_string_charset_hex(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "string", "-n", "1", "-l", "16", "--charset", "hex"],
+			["generate", "string", "--from", "fake.arw", "-n", "1", "-l", "16", "--charset", "hex"],
 			monkeypatch,
 			capsys,
 		)
@@ -245,7 +245,7 @@ class TestGenerateStdout:
 
 	def test_string_charset_alpha(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "string", "-n", "1", "-l", "10", "--charset", "alpha"],
+			["generate", "string", "--from", "fake.arw", "-n", "1", "-l", "10", "--charset", "alpha"],
 			monkeypatch,
 			capsys,
 		)
@@ -254,7 +254,7 @@ class TestGenerateStdout:
 
 	def test_range_type(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "range", "--min", "1", "--max", "6", "-n", "5"],
+			["generate", "range", "--from", "fake.arw", "--min", "1", "--max", "6", "-n", "5"],
 			monkeypatch,
 			capsys,
 		)
@@ -265,7 +265,7 @@ class TestGenerateStdout:
 
 	def test_count_defaults_to_one(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "bytes", "-l", "8"],
+			["generate", "bytes", "--from", "fake.arw", "-l", "8"],
 			monkeypatch,
 			capsys,
 		)
@@ -282,7 +282,7 @@ class TestGenerateFileOutput:
 	def test_bytes_to_file(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path):
 		out_file = tmp_path / "random_bytes.txt"
 		out = run_cli(
-			["generate", "fake.arw", "--type", "bytes", "-n", "2", "-l", "4", "-o", str(out_file)],
+			["generate", "bytes", "--from", "fake.arw", "-n", "2", "-l", "4", "-o", str(out_file)],
 			monkeypatch,
 			capsys,
 		)
@@ -294,7 +294,7 @@ class TestGenerateFileOutput:
 	def test_int_to_file(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path):
 		out_file = tmp_path / "numbers.txt"
 		run_cli(
-			["generate", "fake.arw", "--type", "int", "-n", "4", "-o", str(out_file)],
+			["generate", "int", "--from", "fake.arw", "-n", "4", "-o", str(out_file)],
 			monkeypatch,
 			capsys,
 		)
@@ -312,12 +312,12 @@ class TestGenerateValidation:
 	"""generate raises argparse errors for missing required arguments."""
 
 	def test_missing_type_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
-		out = run_cli(["generate", "fake.arw"], monkeypatch, capsys)
+		out = run_cli(["generate", "--from", "fake.arw"], monkeypatch, capsys)
 		assert "error" in out.err.lower()
 
 	def test_range_without_min_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "range", "--max", "6"],
+			["generate", "range", "--from", "fake.arw", "--max", "6"],
 			monkeypatch,
 			capsys,
 		)
@@ -325,14 +325,14 @@ class TestGenerateValidation:
 
 	def test_range_without_max_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "fake.arw", "--type", "range", "--min", "1"],
+			["generate", "range", "--from", "fake.arw", "--min", "1"],
 			monkeypatch,
 			capsys,
 		)
 		assert "error" in out.err.lower()
 
 	def test_missing_image_path_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
-		out = run_cli(["generate", "--type", "bytes"], monkeypatch, capsys)
+		out = run_cli(["generate", "bytes"], monkeypatch, capsys)
 		assert "error" in out.err.lower()
 
 
@@ -349,10 +349,10 @@ class TestRouting:
 
 	def test_extract_routes_correctly(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		# A successful extract run produces valid hex output
-		out = run_cli(["extract", "fake.arw"], monkeypatch, capsys)
+		out = run_cli(["extract", "hex", "--from", "fake.arw"], monkeypatch, capsys)
 		assert out.out.strip() == MOCK_SEED.hex()
 
 	def test_generate_routes_correctly(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		# A successful generate run produces at least one output line
-		out = run_cli(["generate", "fake.arw", "--type", "bytes", "-l", "8"], monkeypatch, capsys)
+		out = run_cli(["generate", "bytes", "--from", "fake.arw", "-l", "8"], monkeypatch, capsys)
 		assert len(out.out.strip()) > 0
