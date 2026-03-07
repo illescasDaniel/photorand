@@ -134,7 +134,7 @@ seed_bytes = hash_entropy_pool(entropy_pool)
 Alternatively, use the functional pipeline. It accepts custom functions for each part of the algorithm (ingest_fn, sample_fn and hash_fn) although we already provide the values as default parameters:
 ```python
 from photorand.low_level import generate_true_random_number
-seed = generate_true_random_number("path/to/image.raw")
+seed = generate_true_random_number("path/to/image.raw") # returns bytes
 ```
 
 ---
