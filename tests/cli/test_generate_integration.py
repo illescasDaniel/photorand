@@ -16,13 +16,19 @@ def run_cli_integration(args_list: list[str], capsys: pytest.CaptureFixture[str]
 	return capsys.readouterr().out.strip()
 
 
-@pytest.mark.parametrize("image_filename, expected_int, expected_range", [
+@pytest.mark.parametrize("image_filename, expected_int, expected_int_range", [
 	("DSC02111.ARW", 5441230399755021634661702627294439837643765743048098986473439861345281873618919255001375917882451696456632001720700828097273286841568547436452202507760768, 20), # noqa: E501
 	("IMG_6775.CR2", 1983112000144019161378659574769935184153364571863522866163921903212591155076214460720178892638770579202958750617616524851798091481695319032837458803953969, 20), # noqa: E501
 	("DSC03088.ARW", 3295623491421879308436711099041673549102516067157422785057540737909732005548384056302810108111505029508815460346658820938042570895769000942097100592489198, 16), # noqa: E501
 	("DSC03089.ARW", 406985617972906688707974285432327461848063680588482669067211356871213446809847124085706365799856761437958785114466726225109296019541509202268552018876523, 16), # noqa: E501
 ])
-def test_extract_integration(image_filename: str, expected_int: int, expected_range: int, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch):
+def test_extract_integration(
+	image_filename: str,
+	expected_int: int,
+	expected_int_range: int,
+	capsys: pytest.CaptureFixture[str],
+	monkeypatch: pytest.MonkeyPatch
+):
 	base_dir = Path(__file__).resolve().parent.parent
 	image_file = base_dir / "data" / image_filename
 
@@ -40,9 +46,17 @@ def test_extract_integration(image_filename: str, expected_int: int, expected_ra
 	out_int = run_cli_integration(["extract", "int", "--from", image_path], capsys, monkeypatch)
 	assert int(out_int) == expected_int
 
-	# Test range format
-	out_range = run_cli_integration(["extract", "range", "--from", image_path, "--min", "10", "--max", "20"], capsys, monkeypatch)
-	assert int(out_range) == expected_range
+	# Test int-range format
+	out_int_range = run_cli_integration(["extract", "int-range", "--from", image_path, "--min", "10", "--max", "20"], capsys, monkeypatch)
+	assert int(out_int_range) == expected_int_range
+
+	# Test float-range format
+	out_float_range = run_cli_integration(["extract", "float-range", "--from", image_path, "--min", "10.0", "--max", "20.0"], capsys, monkeypatch)
+	assert 10.0 <= float(out_float_range) <= 20.0
+
+	# Test negative float-range
+	out_neg_float = run_cli_integration(["extract", "float-range", "--from", image_path, "--min", "-2.0", "--max", "-1.0"], capsys, monkeypatch)
+	assert -2.0 <= float(out_neg_float) <= -1.0
 
 	# Test bool format
 	out_bool = run_cli_integration(["extract", "bool", "--from", image_path], capsys, monkeypatch)
@@ -97,6 +111,24 @@ def test_generate_integration(capsys: pytest.CaptureFixture[str], monkeypatch: p
 	assert len(lines_float) == 3
 	for line in lines_float:
 		assert 0.0 <= float(line) <= 1.0
+
+	# Generate 3 floats in range
+	out_float_ranges = run_cli_integration(["generate", "float-range", "--from", image_path, "--min", "50.5", "--max", "100.5", "-n", "3"], capsys, monkeypatch)
+	lines_float_range = out_float_ranges.splitlines()
+	assert len(lines_float_range) == 3
+	for line in lines_float_range:
+		assert 50.5 <= float(line) <= 100.5
+
+	# Generate 3 integers in range (renamed)
+	out_int_ranges = run_cli_integration(["generate", "int-range", "--from", image_path, "--min", "1", "--max", "6", "-n", "3"], capsys, monkeypatch)
+	lines_int_range = out_int_ranges.splitlines()
+	assert len(lines_int_range) == 3
+	for line in lines_int_range:
+		assert 1 <= int(line) <= 6
+
+	# Generate negative integers in range
+	out_neg_int = run_cli_integration(["generate", "int-range", "--from", image_path, "--min", "-10", "--max", "-5", "-n", "1"], capsys, monkeypatch)
+	assert -10 <= int(out_neg_int.strip()) <= -5
 
 
 def test_generate_deterministic(capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch):

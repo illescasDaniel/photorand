@@ -60,9 +60,14 @@ def handle_generate(args: argparse.Namespace, parser: argparse.ArgumentParser):
 			for _ in range(args.count)
 		]
 
-	elif args.type == "range":
+	elif args.type == "int-range":
 		results = [
 			str(engine.next_int_range(args.min, args.max)) for _ in range(args.count)
+		]
+
+	elif args.type == "float-range":
+		results = [
+			str(engine.next_float_range(args.min, args.max)) for _ in range(args.count)
 		]
 
 	elif args.type == "bool":

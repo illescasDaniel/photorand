@@ -107,11 +107,33 @@ class PhotoRandSeed:
 
 	def to_float(self) -> float:
 		"""
-		Converts the TRNG seed into a floating point number between 0.0 and 1.0 (inclusive).
+		Converts the TRNG seed into a floating point number between 0.0 (inclusive) and 1.0 (exclusive).
 
 		Returns:
-			float: Random float in [0.0, 1.0].
+			float: Random float in [0.0, 1.0).
 		"""
-		# Use 53 bits for standard IEEE 754 double precision float
-		val = int.from_bytes(self._raw_seed[:7], byteorder="big") & 0x1FFFFFFFFFFFFF
-		return val / 0x1FFFFFFFFFFFFF
+		# Pull the first 7 bytes, shift right by 3 to get exactly 53 bits
+		val = int.from_bytes(self._raw_seed[:7], byteorder="big") >> 3
+
+		# Divide by 2^53 for exact, zero-rounding-error floating point math
+		return val * (2.0 ** -53)
+
+	def to_float_range(self, min_val: float, max_val: float) -> float:
+		"""
+		Converts the TRNG seed into a floating point number within [min_val, max_val) (half-open).
+
+		Args:
+			min_val (float): Lower bound (inclusive).
+			max_val (float): Upper bound (exclusive).
+
+		Returns:
+			float: Random float in [min_val, max_val).
+
+		Raises:
+			ValueError: If max_val is less than min_val.
+		"""
+		if max_val < min_val:
+			raise ValueError("max_val must be greater than or equal to min_val")
+
+		factor = self.to_float()
+		return min_val + (factor * (max_val - min_val))

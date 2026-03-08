@@ -60,6 +60,7 @@ def run_cli(
 		mock_seed.to_int.return_value = int.from_bytes(seed_val, "big")
 		# Simple deterministic mock for range
 		mock_seed.to_int_range.return_value = 10
+		mock_seed.to_float_range.return_value = 1.5
 
 		# Setup mock_engine_class instance
 		mock_engine = MockEngine.return_value
@@ -69,6 +70,7 @@ def run_cli(
 		)
 		mock_engine.next_string.side_effect = lambda length, charset: "a" * length
 		mock_engine.next_int_range.return_value = 5
+		mock_engine.next_float_range.return_value = 1.5
 
 		try:
 			main()
@@ -99,15 +101,24 @@ class TestExtractStdout:
 		expected = int.from_bytes(MOCK_SEED, "big")
 		assert int(out.out.strip()) == expected
 
-	def test_range_format(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+	def test_int_range_format(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		# First byte of MOCK_SEED is 0x00 → candidate 0 → 0 % 11 = 0 → result 10
 		out = run_cli(
-			["extract", "range", "--from", "fake.arw", "--min", "10", "--max", "20"],
+			["extract", "int-range", "--from", "fake.arw", "--min", "10", "--max", "20"],
 			monkeypatch,
 			capsys,
 		)
 		value = int(out.out.strip())
 		assert 10 <= value <= 20
+
+	def test_float_range_format(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+		out = run_cli(
+			["extract", "float-range", "--from", "fake.arw", "--min", "1.0", "--max", "2.0"],
+			monkeypatch,
+			capsys,
+		)
+		value = float(out.out.strip())
+		assert 1.0 <= value <= 2.0
 
 
 # ===========================================================================
@@ -162,25 +173,25 @@ class TestExtractFileOutput:
 class TestExtractValidation:
 	"""extract raises argparse errors for missing required arguments."""
 
-	def test_range_without_min_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+	def test_int_range_without_min_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["extract", "range", "--from", "fake.arw", "--max", "20"],
+			["extract", "int-range", "--from", "fake.arw", "--max", "20"],
 			monkeypatch,
 			capsys,
 		)
 		assert "error" in out.err.lower()
 
-	def test_range_without_max_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+	def test_int_range_without_max_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["extract", "range", "--from", "fake.arw", "--min", "10"],
+			["extract", "int-range", "--from", "fake.arw", "--min", "10"],
 			monkeypatch,
 			capsys,
 		)
 		assert "error" in out.err.lower()
 
-	def test_range_without_both_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+	def test_int_range_without_both_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["extract", "range", "--from", "fake.arw"],
+			["extract", "int-range", "--from", "fake.arw"],
 			monkeypatch,
 			capsys,
 		)
@@ -252,9 +263,9 @@ class TestGenerateStdout:
 		line = out.out.strip()
 		assert line.isalpha()
 
-	def test_range_type(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+	def test_int_range_type(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "range", "--from", "fake.arw", "--min", "1", "--max", "6", "-n", "5"],
+			["generate", "int-range", "--from", "fake.arw", "--min", "1", "--max", "6", "-n", "5"],
 			monkeypatch,
 			capsys,
 		)
@@ -262,6 +273,17 @@ class TestGenerateStdout:
 		assert len(lines) == 5
 		for line in lines:
 			assert 1 <= int(line) <= 6
+
+	def test_float_range_type(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+		out = run_cli(
+			["generate", "float-range", "--from", "fake.arw", "--min", "1.0", "--max", "6.0", "-n", "5"],
+			monkeypatch,
+			capsys,
+		)
+		lines = out.out.strip().splitlines()
+		assert len(lines) == 5
+		for line in lines:
+			assert 1.0 <= float(line) <= 6.0
 
 	def test_count_defaults_to_one(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
@@ -315,17 +337,17 @@ class TestGenerateValidation:
 		out = run_cli(["generate", "--from", "fake.arw"], monkeypatch, capsys)
 		assert "error" in out.err.lower()
 
-	def test_range_without_min_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+	def test_int_range_without_min_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "range", "--from", "fake.arw", "--max", "6"],
+			["generate", "int-range", "--from", "fake.arw", "--max", "6"],
 			monkeypatch,
 			capsys,
 		)
 		assert "error" in out.err.lower()
 
-	def test_range_without_max_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+	def test_int_range_without_max_errors(self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
 		out = run_cli(
-			["generate", "range", "--from", "fake.arw", "--min", "1"],
+			["generate", "int-range", "--from", "fake.arw", "--min", "1"],
 			monkeypatch,
 			capsys,
 		)

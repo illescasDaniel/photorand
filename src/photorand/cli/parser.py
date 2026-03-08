@@ -78,9 +78,13 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 	extract_subparsers.add_parser("bool", parents=[extract_common], help="Output as boolean")
 	extract_subparsers.add_parser("float", parents=[extract_common], help="Output as float between 0 and 1")
 	
-	extract_range = extract_subparsers.add_parser("range", parents=[extract_common], help="Output integer in range")
-	extract_range.add_argument("--min", type=int, required=True, help="Lower bound")
-	extract_range.add_argument("--max", type=int, required=True, help="Upper bound")
+	extract_int_range = extract_subparsers.add_parser("int-range", parents=[extract_common], help="Output integer in range")
+	extract_int_range.add_argument("--min", type=int, required=True, help="Lower bound (inclusive)")
+	extract_int_range.add_argument("--max", type=int, required=True, help="Upper bound (inclusive)")
+
+	extract_float_range = extract_subparsers.add_parser("float-range", parents=[extract_common], help="Output float in range")
+	extract_float_range.add_argument("--min", type=float, required=True, help="Lower bound (inclusive)")
+	extract_float_range.add_argument("--max", type=float, required=True, help="Upper bound (exclusive)")
 
 	# ------------------------------------------------------------------
 	# 'generate' subcommand
@@ -103,9 +107,13 @@ def create_parser() -> Tuple[argparse.ArgumentParser, argparse.ArgumentParser, a
 	gen_string.add_argument("--charset", choices=["ascii", "hex", "alpha", "all"], default="all", help="Character set to use (default: all)")
 	gen_string.add_argument("--numeric-only", action="store_true", help="Only use numbers when generating strings")
 
-	gen_range = gen_subparsers.add_parser("range", parents=[generate_common], help="Generate random integers in range")
-	gen_range.add_argument("--min", type=int, required=True, help="Lower bound")
-	gen_range.add_argument("--max", type=int, required=True, help="Upper bound")
+	gen_int_range = gen_subparsers.add_parser("int-range", parents=[generate_common], help="Generate random integers in range")
+	gen_int_range.add_argument("--min", type=int, required=True, help="Lower bound (inclusive)")
+	gen_int_range.add_argument("--max", type=int, required=True, help="Upper bound (inclusive)")
+
+	gen_float_range = gen_subparsers.add_parser("float-range", parents=[generate_common], help="Generate random floats in range")
+	gen_float_range.add_argument("--min", type=float, required=True, help="Lower bound (inclusive)")
+	gen_float_range.add_argument("--max", type=float, required=True, help="Upper bound (exclusive)")
 
 	gen_subparsers.add_parser("bool", parents=[generate_common], help="Generate random booleans")
 	gen_subparsers.add_parser("float", parents=[generate_common], help="Generate random floats between 0 and 1")

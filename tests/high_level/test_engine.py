@@ -125,9 +125,22 @@ class TestPhotoRandEngine:
 	def test_next_float(self):
 		"""Verify float generation."""
 		engine = PhotoRandEngine(TEST_IMAGE)
-		val_float = engine.next_float()
-		assert isinstance(val_float, float)
-		assert 0.0 <= val_float <= 1.0
+		for _ in range(100):
+			val_float = engine.next_float()
+			assert isinstance(val_float, float)
+			assert 0.0 <= val_float < 1.0, f"Value {val_float} not in [0.0, 1.0)"
+
+	def test_next_float_range(self):
+		"""Verify float range generation."""
+		engine = PhotoRandEngine(TEST_IMAGE)
+		for _ in range(100):
+			val_float = engine.next_float_range(10.0, 20.0)
+			assert 10.0 <= val_float < 20.0, f"Value {val_float} not in [10.0, 20.0)"
+
+		# Test negative range
+		for _ in range(100):
+			val_neg = engine.next_float_range(-2.0, -1.0)
+			assert -2.0 <= val_neg < -1.0, f"Value {val_neg} not in [-2.0, -1.0)"
 
 		# Batch of floats
 		batch = engine.generate_batch(engine.next_float, 20)

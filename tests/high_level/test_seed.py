@@ -41,11 +41,25 @@ class TestPhotoRandSeed:
 			val = seed.to_int_range(100, 200)
 			assert 100 <= val <= 200
 
-	def test_to_bool_and_float(self):
-		"""Verify bool and float generation."""
+	def test_to_bool(self):
+		"""Verify bool generation."""
 		seed = PhotoRandSeed(TEST_IMAGE)
 		val_bool = seed.to_bool()
 		assert isinstance(val_bool, bool)
+
+	def test_to_float(self):
+		"""Verify float generation."""
+		seed = PhotoRandSeed(TEST_IMAGE)
 		val_float = seed.to_float()
 		assert isinstance(val_float, float)
-		assert 0.0 <= val_float <= 1.0
+		assert 0.0 <= val_float < 1.0
+
+	def test_to_float_range(self):
+		"""Verify float range generation."""
+		seed = PhotoRandSeed(TEST_IMAGE)
+		val_float = seed.to_float_range(10.0, 20.0)
+		assert 10.0 <= val_float < 20.0
+
+		# Test negative range
+		val_neg = seed.to_float_range(-2.0, -1.0)
+		assert -2.0 <= val_neg < -1.0

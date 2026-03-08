@@ -65,6 +65,9 @@ print(seed.to_int())
 
 # 3. Roll a D100 using physical entropy (Rejection Sampling)
 luck = seed.to_int_range(1, 100)
+
+# 4. Get a float in range
+prob = seed.to_float_range(0.5, 1.5)
 ```
 
 #### `PhotoRandEngine` (CSPRNG)
@@ -80,6 +83,7 @@ engine = PhotoRandEngine("path/to/image.raw")
 key = engine.next_bytes(32)
 pin = engine.next_string(length=6, charset='numeric')
 dice = engine.next_int_range(1, 20)
+float_luck = engine.next_float_range(10.5, 20.5)
 coin_flip = engine.next_bool()
 probability = engine.next_float()
 
@@ -96,7 +100,10 @@ The package includes a powerful CLI to use these classes directly from your term
 photorand extract hex --from path/to/raw_image.ARW
 
 # Roll a D20
-photorand extract range --from path/to/raw_image.ARW --min 1 --max 20
+photorand extract int-range --from path/to/raw_image.ARW --min 1 --max 20
+
+# Extract a float in range (e.g. -1.0 to 1.0)
+photorand extract float-range --from path/to/raw_image.ARW --min -1.0 --max 1.0
 
 # Generate 5 random 16-char alphanumeric passwords
 photorand generate string --from path/to/raw_image.ARW -n 5 -l 16 --charset alpha
@@ -106,6 +113,9 @@ photorand extract float --from path/to/raw_image.ARW
 
 # Generate 10 boolean values
 photorand generate bool --from path/to/raw_image.ARW -n 10
+
+# Generate 5 floats in a specific range
+photorand generate float-range --from path/to/raw_image.ARW --min 0.5 --max 1.5 -n 5
 ```
 
 *For more details, run:* `photorand --help`

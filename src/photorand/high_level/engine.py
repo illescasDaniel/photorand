@@ -90,30 +90,33 @@ class PhotoRandEngine:
 
 	def next_int_range(self, min_val: int, max_val: int) -> int:
 		"""
-		Generates a random integer within a range using rejection sampling on the byte stream.
+		Generates a random integer within the range [min_val, max_val] (inclusive).
 
 		Args:
-			min_val (int): Lower bound (inclusive).
-			max_val (int): Upper bound (inclusive).
+			min_val (int): The lower bound of the range.
+			max_val (int): The upper bound of the range.
 
 		Returns:
-			int: Random integer in range.
+			int: A random integer.
 		"""
 		range_size = max_val - min_val + 1
 		if range_size <= 0:
 			raise ValueError("max_val must be greater than or equal to min_val")
 
+		# The exact number of bits needed to represent the range
 		num_bits = range_size.bit_length()
 		num_bytes = (num_bits + 7) // 8
-
-		# Calculate limit for rejection sampling to ensure perfect uniformity
-		limit = (1 << (num_bytes * 8)) - (1 << (num_bytes * 8)) % range_size
 
 		while True:
 			raw_bytes = self._get_bytes(num_bytes)
 			val = int.from_bytes(raw_bytes, byteorder="big")
-			if val < limit:
-				return min_val + (val % range_size)
+
+			# Mask the value to the exact bit length needed
+			# e.g., if we need 5 bits, mask with 0b11111 (31)
+			val &= (1 << num_bits) - 1
+
+			if val < range_size:
+				return min_val + val
 
 	def next_string(self, length: int = 16, charset: str = "all") -> str:
 		"""
@@ -155,15 +158,34 @@ class PhotoRandEngine:
 
 	def next_float(self) -> float:
 		"""
-		Generates a random float between 0.0 and 1.0 (inclusive).
+		Generates a random float between 0.0 (inclusive) and 1.0 (exclusive).
 
 		Returns:
-			float: Random float in [0.0, 1.0].
+			float: A random float in [0.0, 1.0).
 		"""
-		# 53 bits for precision
+		# Pull 7 bytes (56 bits), shift right by 3 to get exactly 53 bits
 		raw_bytes = self._get_bytes(7)
-		val = int.from_bytes(raw_bytes, byteorder="big") & 0x1FFFFFFFFFFFFF
-		return val / 0x1FFFFFFFFFFFFF
+		val = int.from_bytes(raw_bytes, byteorder="big") >> 3
+
+		# Divide by 2^53. This is exact and introduces zero rounding error.
+		return val * (2.0 ** -53)
+
+	def next_float_range(self, min_val: float, max_val: float) -> float:
+		"""
+		Generates a random float within the range [min_val, max_val) (half-open).
+
+		Args:
+			min_val (float): The lower bound of the range (inclusive).
+			max_val (float): The upper bound of the range (exclusive).
+
+		Returns:
+			float: A random float in [min_val, max_val).
+		"""
+		if max_val < min_val:
+			raise ValueError("max_val must be greater than or equal to min_val")
+
+		factor = self.next_float()
+		return min_val + (factor * (max_val - min_val))
 
 	def generate_batch(self, type_func: Callable, n: int, **kwargs) -> List:
 		"""
