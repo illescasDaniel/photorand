@@ -120,7 +120,7 @@ class PhotoRandEngine:
 
 	def next_string(self, length: int = 16, charset: str = "all") -> str:
 		"""
-		Generates a random string using the specified character set.
+		Generates a random string using the specified character set via base conversion.
 
 		Args:
 			length (int): Length of the string.
@@ -129,6 +129,9 @@ class PhotoRandEngine:
 		Returns:
 			str: Random string.
 		"""
+		if length <= 0:
+			return ""
+
 		if charset == "all":
 			chars = string.ascii_letters + string.digits + string.punctuation
 		elif charset == "alphanumeric":
@@ -138,12 +141,24 @@ class PhotoRandEngine:
 		elif charset == "hex":
 			chars = "0123456789abcdef"
 		else:
+			if not charset:
+				raise ValueError("charset cannot be empty")
 			chars = charset
 
+		base = len(chars)
+
+		# Calculate the exact number of possible string permutations
+		max_val = (base ** length) - 1
+
+		# Pull ONE massive integer that perfectly represents our string
+		val = self.next_int_range(0, max_val)
+
+		# Convert the integer into base-N to extract the characters
 		result = []
 		for _ in range(length):
-			idx = self.next_int_range(0, len(chars) - 1)
-			result.append(chars[idx])
+			result.append(chars[val % base])
+			val //= base
+
 		return "".join(result)
 
 	def next_bool(self) -> bool:
